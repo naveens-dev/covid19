@@ -1,0 +1,10 @@
+# ignore all __Pycache__ directories
+**/__pycache__
+
+# ignore files in Portfolio_Summary folder
+.vscode/
+.Archive/
+
+# ignore generated report files
+*.xlsx
+*.csv
