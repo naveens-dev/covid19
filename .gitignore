@@ -5,6 +5,9 @@
 .vscode/
 Archive/
 
-# ignore generated report files
+# ignore following file types
 *.xlsx
 *.csv
+*.code-workspace
+*.zip
+*.txt
