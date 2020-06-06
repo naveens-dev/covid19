@@ -3,7 +3,7 @@
 
 # ignore files in Portfolio_Summary folder
 .vscode/
-.Archive/
+Archive/
 
 # ignore generated report files
 *.xlsx
