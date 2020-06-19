@@ -17,9 +17,6 @@ def show_home_page():
     patient_test_result = ['Positive', 'Negative']
     patient_test_value = [data.total_confirmed, int(data.total_individuals_tested) - int(data.total_confirmed)]
 
-    date = data.latest_top_5_date
-    df_conf_top5 = data.df_conf_top5
-
     df_conf_dt = data.df_conf_dt
 
     layout_page = dbc.Container(
@@ -144,16 +141,19 @@ def show_home_page():
                     ),
                     dbc.Col(
                         [
-                            dcc.Graph(id="zones_bar", config={'displayModeBar': False},
-                                      figure={'data': [{'type': 'bar', 'text': data.zone_count,
+                            dcc.Graph(id="top10_bar", config={'displayModeBar': False},
+                                      figure={'data': [{'type': 'bar', 'text': data.df_conf_top10.values,
                                                         'textposition': 'inside', 'hoverinfo': 'none',
-                                                        'x': data.zone_categories, 'y': data.zone_count,
-                                                        'marker':
-                                                            {'color': ['#f28100', '#437a2b', '#750000', '#3b3a3a']}}],
-                                              'layout': {'height': '375', 'title': 'Zone Counts',
+                                                        'x': data.df_conf_top10.index.values,
+                                                        'y': data.df_conf_top10.values,
+                                                        'marker': {'color': data.df_conf_top10.values,
+                                                                   'colorscale': 'Reds'}}],
+                                              'layout': {'height': '375', 'title': f'Top 10 states on '
+                                                                                   f'{data.latest_top_10_date} '
+                                                                                   f'(Confirmed Cases)',
                                                          'paper_bgcolor': '#f8f9fa', 'plot_bgcolor': '#f8f9fa'}}
                                       )
-                        ], lg=3
+                        ], lg=6
                     ),
                     dbc.Col(
                         [
@@ -167,20 +167,6 @@ def show_home_page():
                                                    'title': 'Tests: Positive v/s Negative (cumulative)',
                                                    'paper_bgcolor': '#f8f9fa', 'plot_bgcolor': '#f8f9fa'}}
                             )
-                        ], lg=3
-                    ),
-                    dbc.Col(
-                        [
-                            dcc.Graph(id="top5_bar", config={'displayModeBar': False},
-                                      figure={'data': [{'type': 'bar', 'text': df_conf_top5.values,
-                                                        'textposition': 'inside', 'hoverinfo': 'none',
-                                                        'x': df_conf_top5.index.values, 'y': df_conf_top5.values,
-                                                        'marker': {'color': df_conf_top5.values,
-                                                                   'colorscale': 'Reds'}}],
-                                              'layout': {'height': '375', 'title': f'Top 5 states on {date} '
-                                                                                   f'(Confirmed Cases)',
-                                                         'paper_bgcolor': '#f8f9fa', 'plot_bgcolor': '#f8f9fa'}}
-                                      )
                         ], lg=3
                     ),
                 ]
@@ -213,7 +199,24 @@ def show_home_page():
                         ], lg=6
                     )
                 ]
+            ),
+
+            dbc.Row(
+                [
+                    dbc.Col(
+                        [
+                            dcc.Graph(id='covid-active-daily', config={'displayModeBar': False}, figure={'data': [
+                                {'x': df['date'], 'y': df['dailyactive'], 'type': 'scatter', 'name': 'Active',
+                                 'marker': {'color': '#3a51c7'}}],
+                                'layout': {'title': 'Daily Active Snapshot', 'height': '450',
+                                           'paper_bgcolor': '#f8f9fa', 'plot_bgcolor': '#f8f9fa',
+                                           'yaxis': {'title': 'Patient Count'}}
+                            })
+                        ],
+                    ),
+                ]
             )
+
         ], className='bg-light', fluid=True
     )
 

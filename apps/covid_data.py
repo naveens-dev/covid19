@@ -12,7 +12,7 @@ class CovidData:
         self.total_recovered = 0
         self.total_deceased = 0
         self.total_active = 0
-        self.latest_top_5_date = None
+        self.latest_top_10_date = None
 
         self.data_json_raw = 0
         self.df_data_tested = pd.DataFrame()
@@ -26,7 +26,7 @@ class CovidData:
         self.df_deceased = pd.DataFrame()
         self.df_states = None
         self.df_zones = None
-        self.df_conf_top5 = None
+        self.df_conf_top10 = None
         self.df_conf_dt = None
         self.zone_categories = []
         self.zone_count = []
@@ -118,23 +118,13 @@ class CovidData:
             }
         )
 
-    def get_zone_data(self):
-        response = urllib.request.urlopen('https://api.covid19india.org/zones.json')
-
-        json_data = json.loads(response.read())
-        self.df_zones = pd.DataFrame(json_data['zones'])
-
-        self.zone_categories = self.df_zones['zone'].value_counts().index.values
-        self.zone_categories[-1] = 'Unknown'
-        self.zone_count = self.df_zones['zone'].value_counts().tolist()
-
-    def compute_latest_daily_top_5_states(self):
+    def compute_latest_daily_top_10_states(self):
         df = self.df_sts_conf.copy()
         df = df.iloc[-1, :]
-        self.latest_top_5_date = df['date']
+        self.latest_top_10_date = df['date']
         df = df.drop(['date', 'TT', 'Unnamed: 40'])
         df = df.astype('int32')
-        self.df_conf_top5 = df.nlargest(5)
+        self.df_conf_top10 = df.nlargest(10)
 
     def compute_doubling_time(self):
         df = self.df_sts_conf.copy()
@@ -180,19 +170,11 @@ class CovidData:
                                 ['Date Announced', 'Detected State', 'State code', 'Current Status',
                                  'Status Change Date']]
             df_raw_recov = df_raw.loc[df_raw['Current Status'] == 'Recovered'].copy()
-#            df_raw_recov['Date Announced'] = pd.to_datetime(df_raw_recov['Date Announced'], format='%d/%m/%Y')
-#            df_raw_recov['Status Change Date'] = pd.to_datetime(df_raw_recov['Status Change Date'], format='%d/%m/%Y')
-#            df_raw_recov['Duration'] = df_raw_recov['Status Change Date'] - df_raw_recov['Date Announced']
-#            df_raw_recov['Duration'] = df_raw_recov['Duration'].dt.days
             process_recov_dec(df_raw_recov)
 
             self.df_recovery = self.df_recovery.append(df_raw_recov, ignore_index=True)
 
             df_raw_dec = df_raw.loc[df_raw['Current Status'] == 'Deceased'].copy()
-#            df_raw_dec['Date Announced'] = pd.to_datetime(df_raw_dec['Date Announced'], format='%d/%m/%Y')
-#            df_raw_dec['Status Change Date'] = pd.to_datetime(df_raw_dec['Status Change Date'], format='%d/%m/%Y')
-#            df_raw_dec['Duration'] = df_raw_dec['Status Change Date'] - df_raw_dec['Date Announced']
-#            df_raw_dec['Duration'] = df_raw_dec['Duration'].dt.days
             process_recov_dec(df_raw_dec)
 
             self.df_deceased = self.df_deceased.append(df_raw_dec, ignore_index=True)
@@ -200,8 +182,7 @@ class CovidData:
     def update_data(self):
         self.get_data_json()
         self.get_states_data()
-        self.get_zone_data()
-        self.compute_latest_daily_top_5_states()
+        self.compute_latest_daily_top_10_states()
         self.compute_doubling_time()
         self.get_district_data()
         self.get_states_test_data()

@@ -157,7 +157,7 @@ def show_states_page():
                     dbc.Col(
                         [
                             dcc.Graph(
-                                id='state_recov_dec_spread',
+                                id='state_daily_active',
                                 figure={
                                     'layout': {'height': '520'}}
                             )
@@ -253,7 +253,7 @@ state_code_mapping = {'AN': 'Andaman & Nicobar Island', 'AP': 'Andhra Pradesh', 
                       'KA': 'Karnataka', 'KL': 'Kerala', 'LA': 'Ladakh', 'LD': 'Lakshadweep', 'MH': 'Maharashtra',
                       'ML': 'Meghalaya', 'MN': 'Manipur', 'MP': 'Madhya Pradesh', 'MZ': 'Mizoram', 'NL': 'Nagaland',
                       'OR': 'Odisha', 'PB': 'Punjab', 'PY': 'Puducherry', 'RJ': 'Rajasthan', 'SK': 'Sikkim',
-                      'TG': 'Telangana', 'TN': 'Tamil Nadu', 'TR': 'Tripura', 'UN': 'Unknown', 'UP': 'Uttar Pradesh',
+                      'TG': 'Telangana', 'TN': 'Tamil Nadu', 'TR': 'Tripura', 'UN': 'Unassigned', 'UP': 'Uttar Pradesh',
                       'UT': 'Uttarakhand', 'WB': 'West Bengal'}
 
 
@@ -469,3 +469,25 @@ def display_state_test_table(click_data):
                                           )
 
     return district_table
+
+
+@app.callback(
+    Output("state_daily_active", "figure"),
+    [Input("statewise", "clickData")])
+def display_state_daily(click_data):
+    if click_data is None:
+        state = 'KA'
+    else:
+        state = click_data['points'][0]['label']
+
+    df_active = pd.DataFrame()
+    df_active['date'] = data.df_sts_conf['date']
+    df_active['active'] = data.df_sts_conf[state] - data.df_sts_recov[state] - data.df_sts_dec[state]
+
+    trace = [dict(type="scatter", x=df_active['date'], y=df_active['active'], name='Active',
+                  marker=dict(color='#0317fc'))]
+
+    layout = dict(title=f'Daily Active Snapshot', plot_bgcolor='#f8f9fa', paper_bgcolor='#f8f9fa', height=520,
+                  yaxis={"title": "Patient Count"}, legend=dict(x=.3, y=1.13, orientation='h'))
+
+    return {"data": trace, "layout": layout}
