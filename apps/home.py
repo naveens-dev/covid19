@@ -176,35 +176,6 @@ def show_home_page():
                 [
                     dbc.Col(
                         [
-                            dcc.Graph(id='doubling-time', config={'displayModeBar': False}, figure={'data': [
-                                {'x': df_conf_dt['date'], 'y': df_conf_dt['DT'], 'type': 'scatter', 'name': 'Confirmed',
-                                 'marker': {'color': '#ab13a6'}}],
-                                'layout': {'title': 'Doubling Time', 'height': '375', 'paper_bgcolor': '#f8f9fa',
-                                           'plot_bgcolor': '#f8f9fa', 'yaxis': {'title': 'Days'}}
-                            })
-                        ], lg=6
-                    ),
-
-                    dbc.Col(
-                        [
-                            dcc.Graph(id='recov-dec-spread', config={'displayModeBar': False}, figure={'data': [
-                                {'x': data.df_recovery['Duration'], 'type': 'violin', 'name': 'Recovery',
-                                 'orientation': 'h', 'marker': {'color': '#1c6300'}},
-                                {'x': data.df_deceased['Duration'], 'type': 'violin', 'name': 'Deceased',
-                                 'orientation': 'h', 'marker': {'color': '#b00909'}}],
-                                'layout': {'title': 'Recovery / Deceased Duration Spread', 'height': '375',
-                                           'paper_bgcolor': '#f8f9fa',
-                                           'plot_bgcolor': '#f8f9fa', 'xaxis': {'title': 'Days'}}
-                            })
-                        ], lg=6
-                    )
-                ]
-            ),
-
-            dbc.Row(
-                [
-                    dbc.Col(
-                        [
                             dcc.Graph(id='covid-active-daily', config={'displayModeBar': False}, figure={'data': [
                                 {'x': df['date'], 'y': df['dailyactive'], 'type': 'scatter', 'name': 'Active',
                                  'marker': {'color': '#3a51c7'}}],
@@ -215,7 +186,41 @@ def show_home_page():
                         ],
                     ),
                 ]
-            )
+            ),
+
+            dbc.Row(
+                [
+                    dbc.Col(
+                        [
+                            dcc.Graph(id='covid-mean', config={'displayModeBar': False}, figure={'data': [
+                                {'x': df['date'], 'y': df['dc_mm'], 'type': 'scatter', 'name': 'Confirmed',
+                                 'marker': {'color': '#fa7900'}},
+                                {'x': df['date'], 'y': df['dr_mm'], 'type': 'scatter', 'name': 'Recovered',
+                                 'marker': {'color': '#1c6300'}}],
+                                'layout': {'title': '7-Day Moving Average of Confirmed & Recovered Cases',
+                                           'height': '450', 'paper_bgcolor': '#f8f9fa', 'plot_bgcolor': '#f8f9fa',
+                                           'yaxis': {'title': 'Patient Count'},
+                                           'legend': {'x': 0.42, 'y': 1.13, 'orientation': 'h'}}
+                            })
+                        ],
+                    ),
+                ]
+            ),
+
+            dbc.Row(
+                [
+                    dbc.Col(
+                        [
+                            dcc.Graph(id='doubling-time', config={'displayModeBar': False}, figure={'data': [
+                                {'x': df_conf_dt['date'], 'y': df_conf_dt['DT'], 'type': 'scatter', 'name': 'Confirmed',
+                                 'marker': {'color': '#ab13a6'}}],
+                                'layout': {'title': 'Doubling Time', 'height': '375', 'paper_bgcolor': '#f8f9fa',
+                                           'plot_bgcolor': '#f8f9fa', 'yaxis': {'title': 'Days'}}
+                            })
+                        ],
+                    ),
+                ]
+            ),
 
         ], className='bg-light', fluid=True
     )

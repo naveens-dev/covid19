@@ -146,6 +146,16 @@ def show_states_page():
                 [
                     dbc.Col(
                         [
+                            dcc.Graph(id='state_mean', figure={'layout': {'height': '520'}})
+                        ]
+                    )
+                ]
+            ),
+
+            dbc.Row(
+                [
+                    dbc.Col(
+                        [
                             dcc.Graph(
                                 id='state_daily_percent',
                                 figure={
@@ -308,8 +318,10 @@ def display_state_test_table(click_data):
 
     df_test = df_test.iloc[-1]
 
+    negative_results = float(df_test['Negative'])
+
     positive_perc = round(df_test['Positive'] / df_test['Total Tested'] * 100, 2)
-    negative_perc = round(df_test['Negative'] / df_test['Total Tested'] * 100, 2)
+    negative_perc = round(negative_results / df_test['Total Tested'] * 100, 2)
     pos_data = f'{df_test["Positive"]} ({positive_perc}%)'
     neg_data = f'{df_test["Negative"]} ({negative_perc}%)'
     df_test['Positive'] = pos_data
@@ -485,9 +497,37 @@ def display_state_daily(click_data):
     df_active['active'] = data.df_sts_conf[state] - data.df_sts_recov[state] - data.df_sts_dec[state]
 
     trace = [dict(type="scatter", x=df_active['date'], y=df_active['active'], name='Active',
-                  marker=dict(color='#0317fc'))]
+                  marker=dict(color='#0317fc'))
+             ]
 
     layout = dict(title=f'Daily Active Snapshot', plot_bgcolor='#f8f9fa', paper_bgcolor='#f8f9fa', height=520,
-                  yaxis={"title": "Patient Count"}, legend=dict(x=.3, y=1.13, orientation='h'))
+                  yaxis={"title": "Patient Count"}, legend=dict(x=.32, y=1.13, orientation='h'))
+
+    return {"data": trace, "layout": layout}
+
+
+@app.callback(
+    Output("state_mean", "figure"),
+    [Input("statewise", "clickData")])
+def display_state_daily(click_data):
+    if click_data is None:
+        state = 'KA'
+    else:
+        state = click_data['points'][0]['label']
+
+    df_active = pd.DataFrame()
+    df_active['date'] = data.df_sts_conf['date']
+    df_active['dc_mm'] = data.df_sts_conf[state].rolling(window=7).mean()
+    df_active['dr_mm'] = data.df_sts_recov[state].rolling(window=7).mean()
+
+    trace = [dict(type="scatter", x=df_active['date'], y=df_active['dc_mm'], name='Confirmed',
+                  marker=dict(color='#fa7900')),
+             dict(type="scatter", x=df_active['date'], y=df_active['dr_mm'], name='Recovered',
+                  marker=dict(color='#1c6300'))
+             ]
+
+    layout = dict(title=f'7-Day Moving Average of Confirmed & Recovered Cases', plot_bgcolor='#f8f9fa',
+                  paper_bgcolor='#f8f9fa', height=520, yaxis={"title": "Patient Count"},
+                  legend=dict(x=.42, y=1.13, orientation='h'))
 
     return {"data": trace, "layout": layout}

@@ -19,10 +19,12 @@ df_india_map = data.df_states.copy()
 df_india_map['state_names'] = pd.Categorical(df_india_map['state_names'], cpt_state_ordered_list)
 df_india_map.sort_values('state_names', inplace=True)
 
-with open('f:/naveen/pythonprojects/maps-master/maps-master/Survey-of-India-Index-Maps/Boundaries/India'
-          '/India-States.json') as content:
-    states_json = json.load(content)
+#with open('f:/naveen/pythonprojects/maps-master/maps-master/Survey-of-India-Index-Maps/Boundaries/India'
+#          '/India-States.json') as content:
+#    states_json = json.load(content)
 
+with open('india-states.json') as content:
+    states_json = json.load(content)
 
 india_fig = px.choropleth(df_india_map, geojson=states_json, color='Active', # title="Test",
                           hover_data=['Confirmed', 'Active', 'Recovered', 'Deceased'],
@@ -46,9 +48,12 @@ kar_cen_cd=['556', '583', '572', '555', '565', '558', '557', '578', '582', '570'
 guj_cen_cd=['474', '480', '482', '469', '488', '481', '485', '473', '477', '479', '468', '483', '471', '487', '490', '484',
  '470', '478', '476', '472', '492', '475', '489', '486', '491', '493']
 
-with open(
-        'f:/naveen/pythonprojects/maps-master/maps-master/Survey-of-India-Index-Maps/Boundaries/India/India'
-        '-Districts-2011Census.json') as content:
+#with open(
+#        'f:/naveen/pythonprojects/maps-master/maps-master/Survey-of-India-Index-Maps/Boundaries/India/India'
+#        '-Districts-2011Census.json') as content:
+#    districts = json.load(content)
+
+with open('india-districts-2011census.json') as content:
     districts = json.load(content)
 
 states_fig = px.choropleth(geojson=districts,

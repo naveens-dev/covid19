@@ -59,6 +59,10 @@ class CovidData:
         self.df_cts['date'] = self.df_cts.apply(lambda row: str(row['date']) + '2020', axis=1)
         self.df_cts['date'] = pd.to_datetime(self.df_cts['date'], errors='ignore', format='%d %B %Y')
 
+        # Compute Daily Active moving mean (da_mm) with window of 7 days
+        self.df_cts['dc_mm'] = self.df_cts['dailyconfirmed'].rolling(window=7).mean()
+        self.df_cts['dr_mm'] = self.df_cts['dailyrecovered'].rolling(window=7).mean()
+
         # compute exponential moving average
         # self.df_cts['ema'] = self.df_cts.dailyconfirmed.ewm(span=5, adjust=False).mean()
 
@@ -156,7 +160,8 @@ class CovidData:
                         'https://api.covid19india.org/csv/latest/raw_data3.csv',
                         'https://api.covid19india.org/csv/latest/raw_data4.csv',
                         'https://api.covid19india.org/csv/latest/raw_data5.csv',
-                        'https://api.covid19india.org/csv/latest/raw_data6.csv']
+                        'https://api.covid19india.org/csv/latest/raw_data6.csv',
+                        'https://api.covid19india.org/csv/latest/raw_data7.csv']
 
         def process_recov_dec(df):
             df['Date Announced'] = pd.to_datetime(df['Date Announced'], format='%d/%m/%Y')
@@ -186,7 +191,7 @@ class CovidData:
         self.compute_doubling_time()
         self.get_district_data()
         self.get_states_test_data()
-        self.get_raw_data()
+        # self.get_raw_data()
 
         self.last_updated_time = dt.datetime.now()
 
