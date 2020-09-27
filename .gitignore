@@ -4,10 +4,10 @@
 # ignore files in Portfolio_Summary folder
 .vscode/
 Archive/
+Utilities/
 
 # ignore following file types
 *.xlsx
 *.csv
 *.code-workspace
 *.zip
-*.txt
