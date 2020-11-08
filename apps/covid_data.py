@@ -67,13 +67,16 @@ class CovidData:
         # self.df_cts['ema'] = self.df_cts.dailyconfirmed.ewm(span=5, adjust=False).mean()
 
     def compute_states_cumulative(self):
-        df = self.df_sts_conf.iloc[:, 2:-1]
+        df = self.df_sts_conf.drop(columns='DATEYMD')
+        df = df.iloc[:, 2:-1]
         df_conf = df.sum(axis=0, skipna=True).astype('int32')
 
-        df = self.df_sts_recov.iloc[:, 2:-1]
+        df = self.df_sts_recov.drop(columns='DATEYMD')
+        df = df.iloc[:, 2:-1]
         df_recov = df.sum(axis=0, skipna=True).astype('int32')
 
-        df = self.df_sts_dec.iloc[:, 2:-1]
+        df = self.df_sts_dec.drop(columns='DATEYMD')
+        df = df.iloc[:, 2:-1]
         df_dec = df.sum(axis=0, skipna=True).astype('int32')
 
         df_act = df_conf.subtract(df_recov)
@@ -126,7 +129,7 @@ class CovidData:
         df = self.df_sts_conf.copy()
         df = df.iloc[-1, :]
         self.latest_top_10_date = df['date']
-        df = df.drop(['date', 'TT', 'Unnamed: 40'])
+        df = df.drop(['date', 'TT', 'DATEYMD', 'Unnamed: 41'])
         df = df.astype('int32')
         self.df_conf_top10 = df.nlargest(10)
 
@@ -150,9 +153,7 @@ class CovidData:
     def get_states_test_data(self):
         self.df_sts_test = pd.read_csv('https://api.covid19india.org/csv/latest/statewise_tested_numbers_data.csv')
 
-        self.df_sts_test = self.df_sts_test.loc[:, ['Updated On', 'State', 'Total Tested', 'Positive', 'Negative',
-                                                    'Test positivity rate', 'Tests per thousand', 'Tests per million',
-                                                    'Tests per positive case', 'Population NCP 2019 Projection']]
+        self.df_sts_test = self.df_sts_test.loc[:, ['Updated On', 'State', 'Total Tested', 'Positive', 'Negative']]
 
     def get_raw_data(self):
         raw_data_src = ['https://api.covid19india.org/csv/latest/raw_data1.csv',
